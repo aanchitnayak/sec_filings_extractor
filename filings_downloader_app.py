@@ -298,21 +298,35 @@ st.title("SEC Filings & XBRL Converter")
 tabs = st.tabs(["Download & Convert Data"])
 with tabs[0]:
     st.header("Download SEC Filings and XBRL Data")
+    
+    # Display helper text for each input field.
+    st.markdown("**Ticker symbols:** Enter the stock symbols for companies (e.g., AAPL, MSFT). Use commas to separate multiple tickers.")
+    st.markdown("**Filing forms:** Choose the type of filings to download (e.g., 10-K for annual reports, 10-Q for quarterly reports).")
+    st.markdown("**Start Date:** Only filings on or after this date will be downloaded.")
+    st.markdown("**Download Directory:** The folder where downloaded files will be saved. Default is 'downloads'.")
+    
     tickers_input = st.text_input("Enter ticker symbols (comma-separated)", value="AAPL, MSFT")
+    st.caption("Example: AAPL, MSFT")
+    
     forms_selected = st.multiselect("Select filing forms", options=["10-K", "10-Q"], default=["10-K", "10-Q"])
+    st.caption("Select '10-K' for annual and '10-Q' for quarterly filings.")
+    
     start_date_obj = st.date_input("Start Date", value=datetime.date(2018, 1, 1))
+    st.caption("Filings before this date will be ignored.")
+    
     download_dir = st.text_input("Download Directory", value="downloads")
-
+    st.caption("Folder where all files will be stored. Default: downloads")
+    
     if st.button("Download Data"):
-        # Ensure download directory exists
+        # Ensure download directory exists.
         if not os.path.exists(download_dir):
             os.makedirs(download_dir, exist_ok=True)
         tickers = [t.strip() for t in tickers_input.split(",") if t.strip()]
-        log_rows = []  # For collecting log rows
+        log_rows = []  # For collecting log rows.
         overall_downloaded = 0
 
         for ticker in tickers:
-            status_container = st.empty()  # Create an empty container to dynamically update
+            status_container = st.empty()  # Container for dynamic status updates.
             status_container.subheader(f"Processing ticker: {ticker.upper()}")
             log_rows.insert(0, [ticker.upper(), "", "Subheader", "", f"Downloading {ticker.upper()}"])
             downloaded = download_filings_for_ticker(
@@ -324,7 +338,6 @@ with tabs[0]:
             )
 
             status_container.write(f"✅ Total filing files downloaded for {ticker.upper()}: {downloaded}")
-
             overall_downloaded += downloaded
 
             # Download the XBRL data and automatically convert it to CSV.
@@ -336,7 +349,7 @@ with tabs[0]:
 
         st.success(f"Overall, {overall_downloaded} filing files were downloaded.")
 
-        # Prepare a CSV log (in memory) that the user can download.
+        # Prepare an in-memory CSV log that the user can download.
         csv_buffer = io.StringIO()
         writer = csv.writer(csv_buffer)
         writer.writerow(["Ticker", "Filing Date", "Filing Type", "File Size (bytes)", "Status/Errors"])
