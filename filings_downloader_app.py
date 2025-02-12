@@ -9,7 +9,7 @@ import io
 import streamlit as st
 
 # Set your User-Agent as required by SEC guidelines.
-USER_AGENT = "Aanchit Nayak (anayak@slkone.com)"
+USER_AGENT = "Aanchit Nayak (aanchit.nayak256677@gmail.com)"
 
 
 def get_ticker_mapping():
@@ -303,7 +303,6 @@ with tabs[0]:
     st.markdown("**Ticker symbols:** Enter the stock symbols for companies (e.g., AAPL, MSFT). Use commas to separate multiple tickers.")
     st.markdown("**Filing forms:** Choose the type of filings to download (e.g., 10-K for annual reports, 10-Q for quarterly reports).")
     st.markdown("**Start Date:** Only filings on or after this date will be downloaded.")
-    st.markdown("**Download Directory:** The folder where downloaded files will be saved. Default is 'downloads'.")
     
     tickers_input = st.text_input("Enter ticker symbols (comma-separated)", value="AAPL, MSFT")
     st.caption("Example: AAPL, MSFT")
@@ -314,8 +313,9 @@ with tabs[0]:
     start_date_obj = st.date_input("Start Date", value=datetime.date(2018, 1, 1))
     st.caption("Filings before this date will be ignored.")
     
-    download_dir = st.text_input("Download Directory", value="downloads")
-    st.caption("Folder where all files will be stored. Default: downloads")
+    # Automatically set the download directory to the user's default Downloads folder.
+    download_dir = os.path.join(os.path.expanduser("~"), "Downloads")
+    st.info(f"Files will be saved to your Downloads folder: {download_dir}")
     
     if st.button("Download Data"):
         # Ensure download directory exists.
